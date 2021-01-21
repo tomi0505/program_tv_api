@@ -9,6 +9,7 @@
 ?>
 
 <div id="appEl">
+	<section class="channel-list"></section>
 	<table class="program-tv-table">
 		<tr class="program-tv-table__welcome">
 			<td>
@@ -19,6 +20,33 @@
 </div>
 
 <script>
+// FUNKCJA DO PŁYNNEGO PRZEJŚCIA - PO KLIKNIĘCIU W IKONĘ KANAŁU - DO JEGO ZAWARTOŚCI
+function scrollToAnchor() {
+  const links = document.querySelectorAll('.scroll');
+  links.forEach(each => (each.onclick = scrollAnchors));
+}
+
+function scrollAnchors(e, respond = null) {
+  const distanceToTop = el => Math.floor(el.getBoundingClientRect().top);
+  e.preventDefault();
+  var targetID = (respond) ? respond.getAttribute('href') : this.getAttribute('href');
+  const targetAnchor = document.querySelector(targetID);
+  if (!targetAnchor) return;
+  const originalTop = distanceToTop(targetAnchor);
+  window.scrollBy({ top: originalTop, left: 0, behavior: 'smooth' });
+  const checkIfDone = setInterval(function() {
+    const atBottom = window.innerHeight + window.pageYOffset >= document.body.offsetHeight - 2;
+    if (distanceToTop(targetAnchor) === 0 || atBottom) {
+      targetAnchor.tabIndex = '-1';
+      targetAnchor.focus();
+      window.history.pushState('', '', targetID);
+      clearInterval(checkIfDone);
+    }
+  }, 100);
+}
+// END FUNKCJA DO PŁYNNEGO PRZEJŚCIA - PO KLIKNIĘCIU W IKONĘ KANAŁU - DO JEGO ZAWARTOŚCI
+
+
 // FUNKCJA ZWRACAJĄCA PRZYJAZNY, BARDZIEJ CZYTELNY DLA UŻYTKOWNIKA FORMAT DATY
 function formatTime(clock) {
 	const date = clock.slice(0, 8);
@@ -43,10 +71,22 @@ function formatTime(clock) {
 function renderContentInBrowser(programTV) {
 	const appEl = document.getElementById('appEl');
 	const programTVTableEl = document.querySelector('.program-tv-table');
+	const channelListEl = document.querySelector('.channel-list');
 	programTVTableEl.innerHTML = '';
 
 	programTV.forEach(channel => {
 		const trProgrammeItems = [];
+		const channelId = channel.name.replace(/\s/g, '');
+
+		// GENEROWANIE LISTY KANAŁÓW
+		const programsTVIcon = `
+			<a href="#${channelId}" class="scroll channel-container__link">
+				<img src="${channel.icon}" alt="ikona kanału telewizyjnego" class="channel-container__icon">
+			</a>
+		`;
+
+		channelListEl.insertAdjacentHTML('afterbegin', programsTVIcon);
+		// END GENEROWANIE LISTY KANAŁÓW
 
 		channel.programs.forEach(programme => {
 			const startDate = formatTime(programme.start);
@@ -63,8 +103,9 @@ function renderContentInBrowser(programTV) {
 
 		const trChannelEl = `
 			<tr bgcolor="#DBDB70" class="channel-container">
-				<td>
-					<h4>${channel.name}</h4>
+				<td id="${channelId}">
+					<img src="${channel.icon}" alt="ikona kanału telewizyjnego" class="channel-container__icon">
+					<h4 class="channel-container__title">${channel.name}</h4>
 				</td>
 			</tr>
 			<tr class="programme-container">
@@ -84,12 +125,16 @@ function renderContentInBrowser(programTV) {
 		// WRZUCAM WIERSZE DO TABELI
 		programTVTableEl.insertAdjacentHTML('beforeend', trChannelEl);
 	});
+
+	// START -> FUNKCJA DO PŁYNNEGO PRZEJŚCIA - PO KLIKNIĘCIU W IKONĘ KANAŁU - DO JEGO ZAWARTOŚCI
+	scrollToAnchor();
 };
 
 // ---
 function renderTVDataToDOM(TVData) {
 	const channels = TVData.getElementsByTagName('channel');
 	const programme = TVData.getElementsByTagName('programme');
+	const icon = TVData.getElementsByTagName('icon');
 
 	const channelNamesArr = [];
 	const programmesNamesArr = [];
@@ -105,9 +150,10 @@ function renderTVDataToDOM(TVData) {
 	// ŻEBY ŁATWIEJ OPEROWAĆ NA DANYCH
 	const allChannels = [];
 
-	channelNamesArr.forEach(channelName => {
+	channelNamesArr.forEach((channelName, index) => {
 		const channels = {
 			name: channelName,
+			icon: icon[index].getAttribute('src'),
 			programs: []
 		};
 
