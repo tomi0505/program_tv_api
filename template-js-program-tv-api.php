@@ -10,7 +10,7 @@
 
 <div id="appEl">
 	<table class="program-tv-table">
-		<tr>
+		<tr class="program-tv-table__welcome">
 			<td>
 				<h4>Aktualizacja programu (proszę czekać 10-60 s.)</h4>
 			</td>
@@ -19,7 +19,7 @@
 </div>
 
 <script>
-	// FUNKCJA ZWRACAJĄCA PRZYJAZNY, BARDZIEJ CZYTELNY DLA UŻYTKOWNIKA FORMAT DATY
+// FUNKCJA ZWRACAJĄCA PRZYJAZNY, BARDZIEJ CZYTELNY DLA UŻYTKOWNIKA FORMAT DATY
 function formatTime(clock) {
 	const date = clock.slice(0, 8);
 	const time = clock.slice(8, 14);
@@ -62,12 +62,12 @@ function renderContentInBrowser(programTV) {
 		});
 
 		const trChannelEl = `
-			<tr bgcolor="#DBDB70">
+			<tr bgcolor="#DBDB70" class="channel-container">
 				<td>
 					<h4>${channel.name}</h4>
 				</td>
 			</tr>
-			<tr>
+			<tr class="programme-container">
 				<td>
 					<table>
 						<tr>
@@ -124,7 +124,13 @@ function renderTVDataToDOM(TVData) {
 					desc: programmeItem.getElementsByTagName('desc')[0].textContent,
 				};
 
-				channels.programs.push(prg);
+				// SPRAWDZAM CZY PROGRAM JEST NA JUTRO
+				const dayTVDate = parseInt(prg.start.slice(6,8));
+				const currentDayDate = new Date().getDate();
+
+				if(dayTVDate >= currentDayDate) {
+					channels.programs.push(prg);
+				}
 			}
 		}
 
