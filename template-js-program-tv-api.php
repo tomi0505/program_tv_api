@@ -53,7 +53,7 @@ function renderContentInBrowser(programTV) {
 
 		// GENEROWANIE LISTY KANAŁÓW
 		const programsTVIcon = `
-			<a href="#${channelId}" class="scroll channel-container__link">
+			<a href="#${channelId}" class="channel-container__link">
 				<img src="${channel.icon}" alt="ikona kanału telewizyjnego" class="channel-container__icon">
 			</a>
 		`;
@@ -111,7 +111,7 @@ function renderTVDataToDOM(TVData) {
 
 	// WYSZUKUJĘ 10 1-SZYCH KANAŁÓW Z DANYCH JAKIE OTRZYMAŁEM Z API
 	// I WRZUCAM JE DO TABLICY channelNamesArr
-	for(let i = 0; i < 10; i++) {
+	for(let i = 0; i < 12; i++) {
 		const channelName = channels[i].getElementsByTagName('display-name')[0].textContent;
 		channelNamesArr.push(channelName);
 	}
@@ -152,6 +152,11 @@ function renderTVDataToDOM(TVData) {
 
 		allChannels.push(channels);
 	});
+
+	// USUWANIE KANAŁU, W KTÓRYM NIE MA PROGRAMÓW OD API
+	const emptyChannel = allChannels.find(channel => channel.programs.length === 0);
+	const emptyChannelIndex = allChannels.indexOf(emptyChannel);
+	allChannels.splice(emptyChannelIndex, 1);
 
 	// PRZEKAZUJE OBIEKT Z DANYMI PROGRAMU TV DO PONIŻSZEJ FUNKCJI
 	renderContentInBrowser(allChannels);
