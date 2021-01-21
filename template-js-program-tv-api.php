@@ -171,6 +171,7 @@ function getDataFromAPI() {
 	.then(data => renderDataFromAPI(data));
 };
 
+// PO ZALADOWANIU WSZYSTKICH TAGÓW HTML DO PRZEGLĄDARKI ODPALAM FUNKCJĘ getDataFromAPI();
 document.addEventListener('DOMContentLoaded', function() {
 	getDataFromAPI();
 });
