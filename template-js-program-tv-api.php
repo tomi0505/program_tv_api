@@ -20,33 +20,6 @@
 </div>
 
 <script>
-// FUNKCJA DO PŁYNNEGO PRZEJŚCIA - PO KLIKNIĘCIU W IKONĘ KANAŁU - DO JEGO ZAWARTOŚCI
-function scrollToAnchor() {
-  const links = document.querySelectorAll('.scroll');
-  links.forEach(each => (each.onclick = scrollAnchors));
-}
-
-function scrollAnchors(e, respond = null) {
-  const distanceToTop = el => Math.floor(el.getBoundingClientRect().top);
-  e.preventDefault();
-  var targetID = (respond) ? respond.getAttribute('href') : this.getAttribute('href');
-  const targetAnchor = document.querySelector(targetID);
-  if (!targetAnchor) return;
-  const originalTop = distanceToTop(targetAnchor);
-  window.scrollBy({ top: originalTop, left: 0, behavior: 'smooth' });
-  const checkIfDone = setInterval(function() {
-    const atBottom = window.innerHeight + window.pageYOffset >= document.body.offsetHeight - 2;
-    if (distanceToTop(targetAnchor) === 0 || atBottom) {
-      targetAnchor.tabIndex = '-1';
-      targetAnchor.focus();
-      window.history.pushState('', '', targetID);
-      clearInterval(checkIfDone);
-    }
-  }, 100);
-}
-// END FUNKCJA DO PŁYNNEGO PRZEJŚCIA - PO KLIKNIĘCIU W IKONĘ KANAŁU - DO JEGO ZAWARTOŚCI
-
-
 // FUNKCJA ZWRACAJĄCA PRZYJAZNY, BARDZIEJ CZYTELNY DLA UŻYTKOWNIKA FORMAT DATY
 function formatTime(clock) {
 	const date = clock.slice(0, 8);
@@ -125,9 +98,6 @@ function renderContentInBrowser(programTV) {
 		// WRZUCAM WIERSZE DO TABELI
 		programTVTableEl.insertAdjacentHTML('beforeend', trChannelEl);
 	});
-
-	// START -> FUNKCJA DO PŁYNNEGO PRZEJŚCIA - PO KLIKNIĘCIU W IKONĘ KANAŁU - DO JEGO ZAWARTOŚCI
-	scrollToAnchor();
 };
 
 // ---
